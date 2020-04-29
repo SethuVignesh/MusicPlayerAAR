@@ -13,7 +13,14 @@
         android:theme="@style/AppTheme">
 
 
-        <activity android:name=".musicplayer.view.MusicPlayerActivity"></activity>
+        <activity
+            android:name=".musicplayer.view.MusicPlayerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="your.custom.ACTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".LaunchActivity"
             android:label="@string/title_activity_launch"

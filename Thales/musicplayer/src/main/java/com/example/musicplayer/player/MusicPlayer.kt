@@ -25,6 +25,10 @@ class MusicPlayer(context: Context) {
 
     }
 
+    fun loadSongs(): ArrayList<Song> {
+        return SongUtils.getLocalSongs(context)
+    }
+
     public fun play(path: ArrayList<Song>?, pos: Int?) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -62,12 +66,21 @@ class MusicPlayer(context: Context) {
     }
 
     fun resume() {
-        intent.action = "resume"
-        context.sendBroadcast(intent)
+        if (!BackgroundAudioService.MUSIC_SERVICE_RUNNING) {
+            play(loadSongs(), 0)
+        } else {
+            intent.action = "resume"
+            context.sendBroadcast(intent)
+        }
     }
 
     fun next() {
         intent.action = "next"
+        context.sendBroadcast(intent)
+    }
+
+    fun clear() {
+        intent.action = "clear"
         context.sendBroadcast(intent)
     }
 
@@ -76,6 +89,5 @@ class MusicPlayer(context: Context) {
 
         intent.action = "stop"
         context.sendBroadcast(intent)
-
     }
 }

@@ -13,8 +13,8 @@ public class ContactlessPaymentListener implements ContactlessPaymentServiceList
 
     private Context context;
 
-    public ContactlessPaymentListener(Application app) {
-        this.context = app.getApplicationContext();
+    public ContactlessPaymentListener(){//Application app) {
+//        this.context = app.getApplicationContext();
         // Show UI screen asking user to do second tap
     }
 

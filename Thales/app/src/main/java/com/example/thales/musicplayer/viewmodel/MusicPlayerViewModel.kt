@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.musicplayer.Song
 import com.example.musicplayer.player.Controller
 import com.example.musicplayer.player.MusicPlayer
-import com.example.thales.SongUtils
 
 
 class MusicPlayerViewModel(
@@ -55,9 +54,8 @@ class MusicPlayerViewModel(
     }
 
     fun loadLocalSongs() {
-        val songs = SongUtils.getLocalSongs(context)
+        val songs = musicPlayer.loadSongs()
         songList.value = songs
-
     }
 
     fun play() {

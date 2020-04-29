@@ -1,4 +1,4 @@
-package com.example.thales;
+package com.example.musicplayer.player;
 
 import android.content.Context;
 import android.database.Cursor;

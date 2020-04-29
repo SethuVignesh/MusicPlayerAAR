@@ -1,5 +1,6 @@
 package com.example.thales.designpfp.com.example.mpa;
 
+import android.app.Application;
 import android.os.Bundle;
 
 import com.example.thales.designpfp.CHVerificationMethod;
@@ -7,10 +8,15 @@ import com.example.thales.designpfp.PaymentService;
 import com.example.thales.designpfp.PaymentServiceErrorCode;
 import com.example.thales.designpfp.TransactionContext;
 import com.example.thales.designpfp.com.gemalto.mfs.mwsdk.payment.AbstractHCEService;
+import com.example.thales.designpfp.com.gemalto.mfs.mwsdk.payment.ContactlessPaymentServiceListener;
 import com.example.thales.designpfp.com.gemalto.mfs.mwsdk.payment.PaymentServiceListener;
 
 public class MPAHCEService extends AbstractHCEService {
+ContactlessPaymentServiceListener contactlessPaymentServiceListener;
 
+    MPAHCEService(){
+        contactlessPaymentServiceListener =new ContactlessPaymentListener();
+    }
     @Override
     public PaymentServiceListener setupListener() {
         return null;
@@ -40,6 +46,8 @@ public class MPAHCEService extends AbstractHCEService {
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
         //        AppLogger.i(TAG, "APDU Received from POS::" +
         //                ByteUtils.toHexString(bytes));
+
+
         byte[] responseAPDU = super.processCommandApdu(bytes, bundle);
         if (null != responseAPDU) {
         //            AppLogger.i(TAG, "APDU sent to POS::" +
@@ -47,6 +55,15 @@ public class MPAHCEService extends AbstractHCEService {
         } else {
         //            AppLogger.i(TAG, "APDU sent to POS:: null");
         }
+
+        // add factory to get payment data
+        // make the PFP as singleton
+        contactlessPaymentServiceListener.onTransactionStarted();
+
+//        contactlessPaymentServiceListener.onAuthenticationRequired();
+//        contactlessPaymentServiceListener.onReadyToTap();
+//
+//        contactlessPaymentServiceListener.onTransactionCompleted();
         return responseAPDU;
     }
 }

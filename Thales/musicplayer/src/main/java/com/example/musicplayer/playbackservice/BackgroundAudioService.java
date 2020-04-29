@@ -1,6 +1,5 @@
 package com.example.musicplayer.playbackservice;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,24 +12,25 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
 import com.example.musicplayer.R;
 import com.example.musicplayer.Song;
 import com.example.musicplayer.player.Controller;
-import com.example.musicplayer.player.MusicPlayer;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BackgroundAudioService extends Service implements MediaPlayer.OnCompletionListener {
     MediaPlayer mediaPlayer;
     BroadcastReceiver mReceiver;
     int length = 0;
     int current = 0;
-    List<Song> songList = new ArrayList<>();
+    ArrayList<Song> songList = new ArrayList<>();
     Controller state = Controller.STOP;
+    private RemoteViews mRemoteViews;
+    public static boolean MUSIC_SERVICE_RUNNING = false;
 
     // use this as an inner class like here or as a top-level class
     public class MyReceiver extends BroadcastReceiver {
@@ -51,6 +51,9 @@ public class BackgroundAudioService extends Service implements MediaPlayer.OnCom
                     break;
                 case "resume":
                     resumePlaying();
+                    break;
+                case "clear":
+                    clearNotification();
                     break;
 
             }
@@ -86,7 +89,7 @@ public class BackgroundAudioService extends Service implements MediaPlayer.OnCom
         current = intent.getIntExtra("current", 0);
         startPlaying(songs);
 
-
+        MUSIC_SERVICE_RUNNING = true;
         return START_STICKY;
     }
 
@@ -97,20 +100,39 @@ public class BackgroundAudioService extends Service implements MediaPlayer.OnCom
 
     public void PushNotification(String title, String desc) {
 
-        Intent ii = new Intent(this, MusicPlayer.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, ii, 0);
+        mRemoteViews = new RemoteViews(getPackageName(), R.layout.status_bar_expanded);
 
-        NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
-        bigText.bigText(title);
-        bigText.setBigContentTitle(desc);
-        bigText.setSummaryText(desc);
+        mRemoteViews.setTextViewText(R.id.status_bar_track_name, title);
+        mRemoteViews.setTextViewText(R.id.status_bar_artist_name, desc);
+
+        Intent ii = new Intent(this, MusicPlayerBroadcastLisener.class);
+        ii.setAction("com.example.musicplayer.ACTION_PLAYLIST");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, ii, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Intent playBtn = new Intent(this, MusicPlayerBroadcastLisener.class);
+        playBtn.setAction("com.example.musicplayer.ACTION_PLAY");
+        PendingIntent pendingPlayIntent = PendingIntent.getBroadcast(this, 0, playBtn, 0);
+
+        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_play, pendingPlayIntent);
+
+        Intent pauseBtn = new Intent(this, MusicPlayerBroadcastLisener.class);
+        pauseBtn.setAction("com.example.musicplayer.ACTION_PAUSE");
+        PendingIntent pendingPauseSwitchIntent = PendingIntent.getBroadcast(this, 0, pauseBtn, 0);
+
+        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_pause, pendingPauseSwitchIntent);
+
+        Intent stopBtn = new Intent(this, MusicPlayerBroadcastLisener.class);
+        stopBtn.setAction("com.example.musicplayer.ACTION_STOP");
+        PendingIntent pendingStopSwitchIntent = PendingIntent.getBroadcast(this, 0, stopBtn, 0);
+
+        mRemoteViews.setOnClickPendingIntent(R.id.status_bar_stop, pendingStopSwitchIntent);
+
 
         mBuilder.setContentIntent(pendingIntent);
         mBuilder.setSmallIcon(R.drawable.exo_icon_play);
-        mBuilder.setContentTitle("Your Title");
-        mBuilder.setContentText("Your text");
-        mBuilder.setPriority(Notification.PRIORITY_MAX);
-        mBuilder.setStyle(bigText);
+
+        mBuilder.setContent(mRemoteViews);
+
 
         mNotificationManager =
                 (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -121,7 +143,8 @@ public class BackgroundAudioService extends Service implements MediaPlayer.OnCom
             NotificationChannel channel = new NotificationChannel(
                     channelId,
                     "Thales Music Player",
-                    NotificationManager.IMPORTANCE_HIGH);
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setSound(null, null);
             mNotificationManager.createNotificationChannel(channel);
             mBuilder.setChannelId(channelId);
         }
@@ -130,16 +153,21 @@ public class BackgroundAudioService extends Service implements MediaPlayer.OnCom
 
     }
 
-    public void onDestroy() {
-        stopPlaying();
+    public void clearNotification() {
+        mNotificationManager.cancelAll();
+    }
 
+    public void onDestroy() {
+        MUSIC_SERVICE_RUNNING = false;
+        stopPlaying();
         unregisterReceiver(mReceiver);
     }
 
     public void onCompletion(MediaPlayer _mediaPlayer) {
-
         state = Controller.STOP;
+        MUSIC_SERVICE_RUNNING = false;
     }
+
     public void startPlaying(ArrayList<Song> path) {
         songList = path;
         play(songList.get(current));
@@ -154,6 +182,7 @@ public class BackgroundAudioService extends Service implements MediaPlayer.OnCom
             mediaPlayer.setOnCompletionListener(this);
             mediaPlayer.start();
             PushNotification(song.getTitle(), song.getArtist());
+//            setUpNotification();
             state = Controller.PLAY;
         }
     }
@@ -180,10 +209,15 @@ public class BackgroundAudioService extends Service implements MediaPlayer.OnCom
     }
 
     public void resumePlaying() {
-        if (mediaPlayer == null) return;
-        mediaPlayer.seekTo(length);
-        mediaPlayer.start();
-        state = Controller.RESUME;
+        if (mediaPlayer == null) {
+            startPlaying(songList);
+
+        } else {
+            mediaPlayer.seekTo(length);
+            mediaPlayer.start();
+            state = Controller.RESUME;
+        }
     }
+
 
 }

@@ -8,6 +8,14 @@
         <service
             android:name="com.example.musicplayer.playbackservice.BackgroundAudioService"
             android:process=":externalProcess"></service>
-    </application>
+        <receiver android:name=".playbackservice.MusicPlayerBroadcastLisener">
+            <intent-filter>
+                <action android:name="com.example.musicplayer.ACTION_PLAY" />
+                <action android:name="com.example.musicplayer.ACTION_PAUSE" />
+                <action android:name="com.example.musicplayer.ACTION_STOP" />
+                <action android:name="com.example.musicplayer.ACTION_PLAYLIST" />
+            </intent-filter>
+        </receiver>
 
+    </application>
 </manifest>
