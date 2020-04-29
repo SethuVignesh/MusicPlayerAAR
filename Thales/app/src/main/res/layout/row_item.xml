@@ -40,20 +40,8 @@
                 android:gravity="center_vertical"
                 android:text="artst"
                 android:textColor="@color/colorText" />
-
-            <TextView
-                android:id="@+id/tv_item_song_duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:gravity="center_vertical"
-                android:text="duration"
-                android:textColor="@color/colorText" />
-
         </LinearLayout>
     </LinearLayout>
-
 
 
 </LinearLayout>

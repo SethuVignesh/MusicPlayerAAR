@@ -13,8 +13,8 @@ import com.example.thales.R
 import com.example.thales.musicplayer.viewmodel.MusicPlayerViewModel
 import java.util.*
 
-class MyAdapter(it: List<Song>, val viewmodel: MusicPlayerViewModel?) :
-    RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+class PlaylistAdapter(it: List<Song>, val viewmodel: MusicPlayerViewModel?) :
+    RecyclerView.Adapter<PlaylistAdapter.MyViewHolder>() {
 
     private val rollOverListItem = ArrayList<Song>()
     private var selectedItem = -1;
@@ -69,7 +69,7 @@ class MyAdapter(it: List<Song>, val viewmodel: MusicPlayerViewModel?) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val v = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_song, parent, false)
+            .inflate(R.layout.row_item, parent, false)
         return MyViewHolder(v)
     }
 }

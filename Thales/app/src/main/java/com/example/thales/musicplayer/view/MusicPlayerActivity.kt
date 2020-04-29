@@ -19,7 +19,7 @@ import com.example.thales.musicplayer.viewmodel.MusicPlayerViewModel
 
 class MusicPlayerActivity : AppCompatActivity() {
 
-    private var mAdapter: MyAdapter? = null
+    private var mAdapter: PlaylistAdapter? = null
     private var viewModel: MusicPlayerViewModel? = null
     var musicController: LinearLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +58,7 @@ class MusicPlayerActivity : AppCompatActivity() {
             }
         } else {
             viewModel?.loadLocalSongs()
-            mAdapter = MyAdapter(emptyList(), viewModel)
+            mAdapter = PlaylistAdapter(emptyList(), viewModel)
             viewModel?.songList?.observe(this, Observer {
                 mAdapter?.update(it)
             })
