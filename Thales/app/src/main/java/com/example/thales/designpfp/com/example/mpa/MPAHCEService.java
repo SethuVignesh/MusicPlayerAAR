@@ -48,19 +48,16 @@ public class MPAHCEService extends AbstractHCEService implements PaymentWalletMo
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
 
 //CLA | INS | P1 | P2 | Lc | CData | Le
-        byte[] buffer = apdu.getBuffer();
-        byte cla = buffer[ISO7816.OFFSET_CLA];
-        byte ins = buffer[ISO7816.OFFSET_INS];
-        byte[] p1 = buffer[ISO7816.OFFSET_P1];
+//        byte[] buffer = apdu.getBuffer();
+        byte cla = bytes[ISO7816.OFFSET_CLA];
+        byte ins = bytes[ISO7816.OFFSET_INS];
+        byte[] p1 = bytes[ISO7816.OFFSET_P1];
         boolean PFPenabled = (p1[p1.length - 1] == 1);
 
         walletModule = paymentFactory.getPaymentModule(PFPenabled);
         byte[] responseAPDU = super.processCommandApdu(bytes, bundle);
-        if (null != responseAPDU) {
 
-        } else {
 
-        }
 
 //        firstTapLogic
 //        walletModule with falgs based on APDU
@@ -70,12 +67,19 @@ public class MPAHCEService extends AbstractHCEService implements PaymentWalletMo
         //walletModule with flag disbled to get Factory
 
 
-        contactlessPaymentServiceListener.onTransactionStarted();
 
-        contactlessPaymentServiceListener.onAuthenticationRequired();
-        contactlessPaymentServiceListener.onReadyToTap();
+        if (null != responseAPDU) {
 
-        contactlessPaymentServiceListener.onTransactionCompleted();
+        } else {
+
+        }
+
+//        contactlessPaymentServiceListener.onTransactionStarted();
+//
+//        contactlessPaymentServiceListener.onAuthenticationRequired();
+//        contactlessPaymentServiceListener.onReadyToTap();
+//
+//        contactlessPaymentServiceListener.onTransactionCompleted();
         return responseAPDU;
     }
 
