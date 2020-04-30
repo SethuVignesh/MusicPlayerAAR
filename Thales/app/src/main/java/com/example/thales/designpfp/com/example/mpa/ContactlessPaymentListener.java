@@ -9,7 +9,7 @@ import com.example.thales.designpfp.PaymentServiceErrorCode;
 import com.example.thales.designpfp.TransactionContext;
 import com.example.thales.designpfp.com.gemalto.mfs.mwsdk.payment.ContactlessPaymentServiceListener;
 
-public class ContactlessPaymentListener implements ContactlessPaymentServiceListener {
+public class ContactlessPaymentListener implements ContactlessPaymentServiceListener,PaymentWalletModule {
 
     private Context context;
 
@@ -40,6 +40,11 @@ public class ContactlessPaymentListener implements ContactlessPaymentServiceList
 
     @Override
     public void onError(TransactionContext ctx, PaymentServiceErrorCode error, String msg) {
+
+    }
+
+    @Override
+    public void firstTapCompleted() {
 
     }
 }
